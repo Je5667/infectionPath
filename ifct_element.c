@@ -1,5 +1,5 @@
 //
-//  ifs_element.c
+//  ifct_element.c
 //  InfestPath
 //
 //  Created by Juyeop Kim on 2020/10/20.
@@ -99,6 +99,7 @@ char countryName[N_PLACE+1][MAX_PLACENAME] =
     "Unrecognized"
 };
 
+
 //환자 구조체
 typedef struct patient 
 {
@@ -116,26 +117,34 @@ PATIENT* AllocPerson()
     // 구조체 채움 
     return pSomeone; 
 } 
-/*
-int main() 
-{ 
-PATIENT * pTom = AllocPerson(); 
-// ... 
-free( pTom ); // 할당한 메모리 해제 잊지 맙시다! 
-return 0; 
-} 
-*/
+
+//도시 이름에 대한 Index를 반환하고, 없을 시 Unrecognized에 해당하는 40을 리턴
+int getPlaceIndex(char* Name) {
+    
+    int IsPassed;
+    
+    printf("Checking for Name %s ...\n", Name);
+    for (int i = 0; i < 40 ; i++ ){
+        if (strcmp(countryName[i],Name ) == 0){
+            IsPassed = i;
+            return IsPassed;
+        }
+    }
+    printf("Nothing Matches!! returning Unrecognized(-1)\n");
+    return -1;
+}
 
 //main 함수에서 txt 파일을 읽어서 얻은 데이터를 통해 PATIENT 항목을 생성
 //생성한 정보의 위치를 void* 형태로 저장. 
 // 추후
 // PATIENT (*patient) = ifctele_genElement(~~) 로 사용
 void* ifctele_genElement(int index, int age, unsigned int detected_time, int history_place[N_HISTORY]){
-    //printf("%d, %d ,%d ", history_place[0], history_place[1], history_place[2]);
-    PATIENT * patient = AllocPerson(); 
-    *patient = (PATIENT) { .index = index, .age = age, .detected_time = detected_time,
-                            .history_place[0] = history_place[0], .history_place[1] = history_place[1], .history_place[2] = history_place[2],
-                            .history_place[3] = history_place[3], .history_place[4] = history_place[4]};
+    PATIENT * patient = AllocPerson();
+    *patient = (PATIENT) { .index = index, .age = age, .detected_time = detected_time, .history_place[0] = history_place[0],
+                        .history_place[1] = history_place[1], .history_place[2] = history_place[2],
+                        .history_place[3] = history_place[3], .history_place[4] = history_place[4]
+    };
+    //free(patient);
     //patient = {index, age, detected_time, history_place};
     return patient;
 }
@@ -154,7 +163,7 @@ int ifctele_getHistPlaceIndex(void* obj, int index){
 unsigned int ifctele_getinfestedTime(void* obj){
     PATIENT (*patient) = obj;
     int date = patient->detected_time;
-    return date-3;
+    return date;
 }
 
 //PATIENT 의 나이를 반환
@@ -163,15 +172,26 @@ int ifctele_getAge(void* obj){
     return patient->age;
 }
 
-//Professor Bold체 
 //환자의 모든 정보를 반환
 void ifctele_printElement(void* obj){
     PATIENT (*patient) = obj;
-    printf("확진번호 : %d, 나이: %2d, 확진시점: %2d, 장소: %-12s -> %-12s -> %-12s -> %-12s ->%-12s \n",
+   printf("확진번호 : %d, 나이: %2d, 확진시점: %2d, 장소: %-12s -> %-12s -> %-12s -> %-12s ->%-12s \n",
         patient->index, patient->age, patient->detected_time, countryName[patient->history_place[0]],
 		countryName[patient->history_place[1]], countryName[patient->history_place[2]],
         countryName[patient->history_place[3]], countryName[patient->history_place[4]]);
 }
+
+
+// PATIENT의 history_place의 index 에서의 시간(Int)를 반환
+int ifctele_getHistPlaceTime(void* obj, int index){
+    PATIENT (*patient) = obj;
+    for (int i = 0; i < 5 ; i++){
+        if (patient->history_place[i] == index){
+            return patient->detected_time - 4 + i ;
+        }
+    }
+}
+
 /*
 
 PATIENT* patient_info();
